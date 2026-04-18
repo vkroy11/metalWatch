@@ -1,8 +1,8 @@
 # MetalWatch
 
-A React Native (Expo) app that tracks live INR prices for precious metals — Gold, Silver, Platinum, Palladium — at 24K / 22K / 18K purity, for Indian retail investors.
+A React Native (Expo) app that tracks live INR prices for precious metals — Gold, Silver, Platinum, Palladium — at 24K / 22K / 18K purity (only for gold), for Indian retail investors.
 
-- **Design direction:** Liquid Glass on a dark navy canvas. See `design-preview/index.html` for the visual source of truth and `design-prompt.md` for the full brief.
+- **Design direction:** Liquid Glass on a dark navy canvas. See `design-preview/index.html` for the visual source of truth.
 - **Architecture:** `metals.dev → Adapter (conversion + purity) → React Query → UI`. Business math lives in `src/adapters/` and nowhere else. See `CLAUDE.md`.
 
 ## Setup
@@ -26,16 +26,16 @@ Get a free key at https://metals.dev/.
 
 ## Stack
 
-| Layer | Tech |
-|---|---|
-| Framework | Expo SDK 54 (React Native 0.81, React 19, New Architecture) |
-| Routing | expo-router v6 (file-based) |
-| Fetching | `@tanstack/react-query` v5 |
-| Typing | TypeScript strict, zod for API response validation |
-| UI | `expo-blur`, `react-native-svg`, `expo-linear-gradient`, Reanimated v4 |
-| Fonts | Inter + IBM Plex Mono (via `@expo-google-fonts/*`) |
-| State | Zustand (purity toggle only) |
-| Persistence | `@react-native-async-storage/async-storage` (24h delta reference) |
+| Layer       | Tech                                                                   |
+| ----------- | ---------------------------------------------------------------------- |
+| Framework   | Expo SDK 54 (React Native 0.81, React 19, New Architecture)            |
+| Routing     | expo-router v6 (file-based)                                            |
+| Fetching    | `@tanstack/react-query` v5                                             |
+| Typing      | TypeScript strict, zod for API response validation                     |
+| UI          | `expo-blur`, `react-native-svg`, `expo-linear-gradient`, Reanimated v4 |
+| Fonts       | Inter + IBM Plex Mono (via `@expo-google-fonts/*`)                     |
+| State       | Zustand (purity toggle only)                                           |
+| Persistence | `@react-native-async-storage/async-storage` (24h delta reference)      |
 
 ## Scripts
 
@@ -77,5 +77,7 @@ metals.dev's free plan refreshes on a slower cadence than true realtime, so Reac
 - Every price / delta / axis tick uses IBM Plex Mono with `tabular-nums`.
 - Gain / loss is always encoded by **arrow glyph + sign + colour** — never colour alone.
 - `prefers-reduced-motion` disables tile press-scale, aurora drift, and skeleton sheen.
+
 # metalWatch
+
 # metalWatch
