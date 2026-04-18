@@ -1,0 +1,117 @@
+import type { Symbol } from '../types/metals';
+
+export const tokens = {
+  colors: {
+    bg: '#0B1020',
+    bgDeep: '#060912',
+    bgMid: '#0F172A',
+    text: '#F8FAFC',
+    text2: '#CBD5E1',
+    muted: '#94A3B8',
+    gain: '#34D399',
+    gainDeep: '#10B981',
+    loss: '#F87171',
+    lossDeep: '#EF4444',
+    violet: '#8B5CF6',
+    gold: '#F59E0B',
+    goldBright: '#FBBF24',
+    glass: 'rgba(255,255,255,0.06)',
+    glassStrong: 'rgba(255,255,255,0.10)',
+    stroke: 'rgba(255,255,255,0.10)',
+    strokeStrong: 'rgba(255,255,255,0.14)',
+    scrim: 'rgba(15,23,42,0.72)',
+    fallback: 'rgba(15,23,42,0.92)',
+    chipInactive: 'rgba(255,255,255,0.04)',
+  },
+  metalGradients: {
+    XAU: ['#F59E0B', '#FBBF24'] as const,
+    XAG: ['#E5E7EB', '#9CA3AF'] as const,
+    XPT: ['#A5B4FC', '#64748B'] as const,
+    XPD: ['#C4B5FD', '#7C8797'] as const,
+  } satisfies Record<Symbol, readonly [string, string]>,
+  metalGlow: {
+    XAU: 'rgba(245,158,11,0.40)',
+    XAG: 'rgba(226,232,240,0.18)',
+    XPT: 'rgba(165,180,252,0.28)',
+    XPD: 'rgba(196,181,253,0.28)',
+  } satisfies Record<Symbol, string>,
+  // Matching-hue alpha-0 endpoints so LinearGradient interpolates through the
+  // glow's own colour rather than fading through black (what "transparent"
+  // does on React Native, causing visible banding).
+  metalGlowFade: {
+    XAU: 'rgba(245,158,11,0)',
+    XAG: 'rgba(226,232,240,0)',
+    XPT: 'rgba(165,180,252,0)',
+    XPD: 'rgba(196,181,253,0)',
+  } satisfies Record<Symbol, string>,
+  radii: {
+    chip: 8,
+    card: 16,
+    tile: 20,
+    hero: 28,
+    pill: 999,
+  },
+  spacing: {
+    xs: 4,
+    sm: 8,
+    md: 12,
+    lg: 16,
+    xl: 20,
+    xxl: 24,
+    xxxl: 32,
+    huge: 48,
+  },
+  fonts: {
+    ui: 'Inter',
+    uiMedium: 'Inter-Medium',
+    uiSemibold: 'Inter-SemiBold',
+    uiBold: 'Inter-Bold',
+    mono: 'IBMPlexMono',
+    monoMedium: 'IBMPlexMono-Medium',
+    monoSemibold: 'IBMPlexMono-SemiBold',
+  },
+  type: {
+    heroPrice: { fontFamily: 'IBMPlexMono-SemiBold', fontSize: 40, letterSpacing: -0.8 },
+    tilePrice: { fontFamily: 'IBMPlexMono-SemiBold', fontSize: 24, letterSpacing: -0.3 },
+    statValue: { fontFamily: 'IBMPlexMono-SemiBold', fontSize: 15 },
+    monoSmall: { fontFamily: 'IBMPlexMono-Medium', fontSize: 12 },
+    monoTiny: { fontFamily: 'IBMPlexMono', fontSize: 10 },
+    displayName: { fontFamily: 'Inter-SemiBold', fontSize: 22, letterSpacing: -0.4 },
+    title: { fontFamily: 'Inter-SemiBold', fontSize: 17, letterSpacing: -0.2 },
+    name: { fontFamily: 'Inter-SemiBold', fontSize: 14 },
+    label: { fontFamily: 'Inter-Medium', fontSize: 13 },
+    labelSmall: { fontFamily: 'Inter-Medium', fontSize: 11 },
+    caption: { fontFamily: 'Inter', fontSize: 11 },
+    timestamp: { fontFamily: 'Inter-Medium', fontSize: 10, letterSpacing: 1 },
+  },
+  shadow: {
+    card: {
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 20 },
+      shadowOpacity: 0.45,
+      shadowRadius: 20,
+      elevation: 8,
+    },
+    heroCard: {
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 28 },
+      shadowOpacity: 0.55,
+      shadowRadius: 28,
+      elevation: 12,
+    },
+    goldGlow: {
+      shadowColor: '#F59E0B',
+      shadowOffset: { width: 0, height: 6 },
+      shadowOpacity: 0.5,
+      shadowRadius: 18,
+      elevation: 6,
+    },
+  },
+  motion: {
+    micro: 160,
+    standard: 240,
+    morph: 520,
+  },
+} as const;
+
+export type Tokens = typeof tokens;

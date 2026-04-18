@@ -1,0 +1,594 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>MetalWatch — Liquid Glass Preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0B1020;
+    --text: #F8FAFC;
+    --text-2: #CBD5E1;
+    --muted: #94A3B8;
+    --gain: #34D399;
+    --loss: #F87171;
+    --gold-a: #F59E0B;
+    --gold-b: #FBBF24;
+    --silver-a: #E5E7EB;
+    --silver-b: #9CA3AF;
+    --plat-a: #A5B4FC;
+    --plat-b: #64748B;
+    --pall-a: #C4B5FD;
+    --pall-b: #7C8797;
+    --violet: #8B5CF6;
+    --glass: rgba(255,255,255,0.06);
+    --glass-strong: rgba(255,255,255,0.10);
+    --stroke: rgba(255,255,255,0.10);
+    --stroke-2: rgba(255,255,255,0.14);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background:
+      radial-gradient(800px 600px at 90% -10%, rgba(245,158,11,0.10), transparent 60%),
+      radial-gradient(700px 500px at -10% 110%, rgba(139,92,246,0.08), transparent 60%),
+      linear-gradient(180deg, #0B1020 0%, #090d1a 60%, #05070e 100%);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 56px 24px 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 40px;
+  }
+  .lab-title {
+    font-size: 13px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  .lab-title b { color: var(--text); letter-spacing: 2px; }
+  .stage {
+    display: flex;
+    gap: 48px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .phone {
+    width: 390px;
+    height: 844px;
+    border-radius: 52px;
+    padding: 12px;
+    background: linear-gradient(145deg, #1a2140, #0a0f22);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.08) inset,
+      0 40px 80px -20px rgba(0,0,0,0.6),
+      0 0 0 1px rgba(255,255,255,0.04);
+    position: relative;
+  }
+  .screen {
+    width: 100%; height: 100%;
+    border-radius: 42px;
+    overflow: hidden;
+    position: relative;
+    background: var(--bg);
+  }
+  .screen::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(420px 340px at 100% 0%, rgba(245,158,11,0.22), transparent 60%),
+      radial-gradient(420px 420px at 0% 100%, rgba(139,92,246,0.18), transparent 60%),
+      linear-gradient(180deg, #0F172A 0%, #0B1020 60%, #060912 100%);
+    z-index: 0;
+  }
+  .notch {
+    position: absolute;
+    top: 18px; left: 50%;
+    transform: translateX(-50%);
+    width: 120px; height: 30px;
+    background: #000;
+    border-radius: 18px;
+    z-index: 10;
+  }
+  .content {
+    position: relative; z-index: 2;
+    height: 100%;
+    padding: 56px 20px 28px;
+    display: flex; flex-direction: column;
+    overflow: hidden;
+  }
+  .caption {
+    text-align: center; margin-top: 14px;
+    color: var(--muted);
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .glass {
+    background: var(--glass);
+    backdrop-filter: blur(24px) saturate(140%);
+    -webkit-backdrop-filter: blur(24px) saturate(140%);
+    border: 1px solid var(--stroke);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.08) inset,
+      0 20px 40px -20px rgba(0,0,0,0.55);
+    border-radius: 20px;
+  }
+  .glass-strong {
+    background: var(--glass-strong);
+    backdrop-filter: blur(32px) saturate(140%);
+    -webkit-backdrop-filter: blur(32px) saturate(140%);
+    border: 1px solid var(--stroke-2);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.10) inset,
+      0 28px 60px -24px rgba(0,0,0,0.65);
+    border-radius: 28px;
+  }
+
+  /* Landing */
+  .topbar {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 14px;
+    border-radius: 999px;
+  }
+  .brand { font-weight: 600; font-size: 16px; letter-spacing: -0.2px; }
+  .brand .w {
+    background: linear-gradient(135deg, var(--gold-a), var(--violet));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .live {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 11px; color: var(--text-2); letter-spacing: 0.5px;
+  }
+  .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--gain);
+    box-shadow: 0 0 10px rgba(52,211,153,0.8);
+  }
+  .hero-line {
+    margin-top: 18px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .hero-line .label { font-size: 13px; color: var(--text-2); }
+  .seg { display: flex; gap: 2px; padding: 4px; border-radius: 999px; }
+  .seg button {
+    all: unset;
+    padding: 6px 12px; font-size: 12px; color: var(--text-2);
+    border-radius: 999px; cursor: pointer; font-weight: 500;
+  }
+  .seg button.active {
+    background: rgba(255,255,255,0.10);
+    color: var(--text);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.08) inset;
+  }
+  .grid {
+    margin-top: 18px;
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    flex: 1;
+  }
+  .tile {
+    position: relative;
+    padding: 14px 14px 12px 18px;
+    overflow: hidden;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .tile .edge {
+    position: absolute; left: 0; top: 12px; bottom: 12px; width: 2.5px;
+    border-radius: 4px;
+  }
+  .edge.gold { background: linear-gradient(180deg, var(--gold-a), var(--gold-b)); box-shadow: 0 0 12px rgba(245,158,11,0.5); }
+  .edge.silver { background: linear-gradient(180deg, var(--silver-a), var(--silver-b)); }
+  .edge.plat { background: linear-gradient(180deg, var(--plat-a), var(--plat-b)); box-shadow: 0 0 12px rgba(165,180,252,0.35); }
+  .edge.pall { background: linear-gradient(180deg, var(--pall-a), var(--pall-b)); box-shadow: 0 0 12px rgba(196,181,253,0.35); }
+  .tile .glow {
+    position: absolute; inset: -20%;
+    z-index: -1; opacity: 0.35;
+    filter: blur(30px);
+    pointer-events: none;
+  }
+  .glow.gold { background: radial-gradient(circle at 85% 20%, rgba(245,158,11,0.40), transparent 60%); }
+  .glow.silver { background: radial-gradient(circle at 85% 20%, rgba(226,232,240,0.18), transparent 60%); }
+  .glow.plat { background: radial-gradient(circle at 85% 20%, rgba(165,180,252,0.25), transparent 60%); }
+  .glow.pall { background: radial-gradient(circle at 85% 20%, rgba(196,181,253,0.25), transparent 60%); }
+
+  .tile-head { display: flex; align-items: center; gap: 8px; }
+  .swatch {
+    width: 12px; height: 12px; border-radius: 4px;
+    border: 1px solid rgba(255,255,255,0.18);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.15) inset;
+  }
+  .swatch.gold { background: linear-gradient(135deg, var(--gold-a), var(--gold-b)); }
+  .swatch.silver { background: linear-gradient(135deg, var(--silver-a), var(--silver-b)); }
+  .swatch.plat { background: linear-gradient(135deg, var(--plat-a), var(--plat-b)); }
+  .swatch.pall { background: linear-gradient(135deg, var(--pall-a), var(--pall-b)); }
+  .name { font-size: 14px; font-weight: 600; color: var(--text); }
+  .chip {
+    margin-left: auto;
+    font-size: 10px; letter-spacing: 0.6px;
+    padding: 2px 7px; border-radius: 999px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--stroke);
+    color: var(--text-2);
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .price {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 22px; font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.3px;
+    margin-top: 2px;
+  }
+  .purity { font-size: 11px; color: var(--text-2); font-weight: 500; }
+  .delta {
+    display: flex; align-items: center; gap: 6px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-variant-numeric: tabular-nums;
+    font-size: 12px; font-weight: 500;
+  }
+  .delta.up { color: var(--gain); }
+  .delta.down { color: var(--loss); }
+  .spark { height: 40px; width: 100%; margin-top: 2px; }
+  .ts {
+    margin-top: 2px;
+    font-size: 10px; letter-spacing: 1px;
+    color: var(--muted); text-transform: uppercase;
+  }
+  .footer-note {
+    margin-top: 14px;
+    text-align: center;
+    font-size: 10px; letter-spacing: 1px;
+    color: var(--muted); text-transform: uppercase;
+  }
+
+  /* Detail */
+  .nav {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 12px;
+    border-radius: 999px;
+  }
+  .iconbtn {
+    width: 34px; height: 34px; border-radius: 999px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--stroke);
+    display: grid; place-items: center; color: var(--text);
+  }
+  .nav-title { font-size: 15px; font-weight: 600; }
+  .hero {
+    margin-top: 16px;
+    padding: 20px;
+    display: flex; flex-direction: column; gap: 8px;
+    position: relative; overflow: hidden;
+  }
+  .hero::after {
+    content:''; position:absolute; inset:-30%;
+    background: radial-gradient(circle at 80% 0%, rgba(245,158,11,0.28), transparent 55%);
+    filter: blur(40px); z-index:-1; opacity:0.7;
+  }
+  .hero-head { display:flex; align-items:center; gap:10px; }
+  .hero-price {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 40px; font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.8px;
+    margin-top: 4px;
+  }
+  .range-delta {
+    display:flex; align-items:center; justify-content: space-between;
+    margin-top: 2px;
+  }
+  .range-delta .d {
+    font-family: 'IBM Plex Mono', monospace;
+    font-variant-numeric: tabular-nums;
+    font-size: 13px; font-weight: 500;
+    color: var(--gain);
+    display:flex; align-items:center; gap:6px;
+  }
+  .purity-pill {
+    display:flex; gap:2px; padding:4px; border-radius:999px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--stroke);
+  }
+  .purity-pill button {
+    all: unset;
+    padding: 5px 10px; font-size: 11px; color: var(--text-2);
+    border-radius: 999px; cursor: pointer; font-weight: 500;
+  }
+  .purity-pill button.active {
+    background: linear-gradient(135deg, var(--gold-a), var(--gold-b));
+    color: #0B1020; font-weight: 600;
+  }
+
+  .chart-card { margin-top: 14px; padding: 16px 14px 8px; position: relative; }
+  .chart { width: 100%; height: 200px; display:block; }
+  .chart-axis {
+    display:flex; justify-content: space-between;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px; color: var(--muted);
+    padding: 0 6px; margin-top: 6px;
+  }
+  .range-chips { margin-top: 14px; display:flex; gap: 8px; padding: 4px; }
+  .range-chips .chipbtn {
+    all: unset;
+    flex:1; text-align:center;
+    padding: 9px 0; font-size: 12px; font-weight: 600;
+    color: var(--text-2);
+    border-radius: 999px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--stroke);
+    cursor: pointer;
+  }
+  .range-chips .chipbtn.active {
+    background: linear-gradient(135deg, var(--gold-a), var(--gold-b));
+    color: #0B1020;
+    border-color: transparent;
+    box-shadow: 0 6px 20px -8px rgba(245,158,11,0.7);
+  }
+  .stats {
+    margin-top: 14px;
+    display:grid; grid-template-columns: 1fr 1fr 1fr;
+    padding: 14px 6px;
+  }
+  .stat { text-align:center; position: relative; }
+  .stat + .stat::before {
+    content:''; position:absolute; left:0; top:10%; bottom:10%;
+    width:1px; background: var(--stroke);
+  }
+  .stat .k {
+    font-size: 10px; letter-spacing: 1.2px; text-transform: uppercase;
+    color: var(--muted); font-weight: 500;
+  }
+  .stat .v {
+    font-family: 'IBM Plex Mono', monospace;
+    font-variant-numeric: tabular-nums;
+    font-size: 15px; font-weight: 600; color: var(--text);
+    margin-top: 4px;
+  }
+
+  .tip {
+    position: absolute;
+    left: 42%; top: 40px;
+    padding: 6px 10px; border-radius: 10px;
+    background: rgba(15,23,42,0.72);
+    border: 1px solid var(--stroke-2);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    display: flex; flex-direction: column; gap: 2px;
+    white-space: nowrap;
+  }
+  .tip .tip-ts { font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+</style>
+</head>
+<body>
+  <div class="lab-title"><b>MetalWatch</b> &nbsp;·&nbsp; Liquid Glass Preview</div>
+
+  <div class="stage">
+
+    <!-- LANDING -->
+    <div>
+      <div class="phone">
+        <div class="screen">
+          <div class="notch"></div>
+          <div class="content">
+
+            <div class="topbar glass">
+              <div class="brand">Metal<span class="w">W</span>atch</div>
+              <div class="live"><span class="dot"></span>LIVE · UPDATED 12s AGO</div>
+            </div>
+
+            <div class="hero-line">
+              <div class="label">Prices in INR / gram</div>
+              <div class="seg glass">
+                <button>24K</button>
+                <button class="active">22K</button>
+                <button>18K</button>
+              </div>
+            </div>
+
+            <div class="grid">
+
+              <div class="tile glass">
+                <div class="glow gold"></div>
+                <div class="edge gold"></div>
+                <div class="tile-head">
+                  <span class="swatch gold"></span>
+                  <span class="name">Gold</span>
+                  <span class="chip">XAU</span>
+                </div>
+                <div class="price">₹ 7,284.50</div>
+                <div class="purity">per gram · 22K</div>
+                <div class="delta up">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="7 14 12 9 17 14"/></svg>
+                  ₹42.10 &nbsp;+0.58%
+                </div>
+                <svg class="spark" viewBox="0 0 120 40" preserveAspectRatio="none">
+                  <defs>
+                    <linearGradient id="gline" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#34D399"/><stop offset="1" stop-color="#10B981"/></linearGradient>
+                    <radialGradient id="gfill" cx="50%" cy="100%" r="80%"><stop offset="0" stop-color="#10B981" stop-opacity="0.35"/><stop offset="1" stop-color="#10B981" stop-opacity="0"/></radialGradient>
+                    <linearGradient id="sline" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F87171"/><stop offset="1" stop-color="#EF4444"/></linearGradient>
+                  </defs>
+                  <path d="M0,30 L10,28 L22,30 L34,22 L46,24 L58,18 L70,20 L82,14 L94,16 L106,10 L120,8 L120,40 L0,40 Z" fill="url(#gfill)"/>
+                  <path d="M0,30 L10,28 L22,30 L34,22 L46,24 L58,18 L70,20 L82,14 L94,16 L106,10 L120,8" fill="none" stroke="url(#gline)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <div class="ts">UPDATED 14:32</div>
+              </div>
+
+              <div class="tile glass">
+                <div class="glow silver"></div>
+                <div class="edge silver"></div>
+                <div class="tile-head">
+                  <span class="swatch silver"></span>
+                  <span class="name">Silver</span>
+                  <span class="chip">XAG</span>
+                </div>
+                <div class="price">₹ 92.18</div>
+                <div class="purity">per gram · 22K</div>
+                <div class="delta down">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="7 10 12 15 17 10"/></svg>
+                  ₹0.84 &nbsp;−0.90%
+                </div>
+                <svg class="spark" viewBox="0 0 120 40" preserveAspectRatio="none">
+                  <path d="M0,10 L10,14 L22,12 L34,18 L46,16 L58,22 L70,20 L82,26 L94,24 L106,30 L120,32" fill="none" stroke="url(#sline)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <div class="ts">UPDATED 14:32</div>
+              </div>
+
+              <div class="tile glass">
+                <div class="glow plat"></div>
+                <div class="edge plat"></div>
+                <div class="tile-head">
+                  <span class="swatch plat"></span>
+                  <span class="name">Platinum</span>
+                  <span class="chip">XPT</span>
+                </div>
+                <div class="price">₹ 2,642.00</div>
+                <div class="purity">per gram · 22K</div>
+                <div class="delta up">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="7 14 12 9 17 14"/></svg>
+                  ₹18.20 &nbsp;+0.69%
+                </div>
+                <svg class="spark" viewBox="0 0 120 40" preserveAspectRatio="none">
+                  <path d="M0,28 L10,26 L22,28 L34,24 L46,26 L58,20 L70,22 L82,18 L94,14 L106,16 L120,12" fill="none" stroke="url(#gline)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <div class="ts">UPDATED 14:32</div>
+              </div>
+
+              <div class="tile glass">
+                <div class="glow pall"></div>
+                <div class="edge pall"></div>
+                <div class="tile-head">
+                  <span class="swatch pall"></span>
+                  <span class="name">Palladium</span>
+                  <span class="chip">XPD</span>
+                </div>
+                <div class="price">₹ 2,930.75</div>
+                <div class="purity">per gram · 22K</div>
+                <div class="delta down">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="7 10 12 15 17 10"/></svg>
+                  ₹11.40 &nbsp;−0.39%
+                </div>
+                <svg class="spark" viewBox="0 0 120 40" preserveAspectRatio="none">
+                  <path d="M0,14 L10,16 L22,14 L34,18 L46,16 L58,22 L70,20 L82,24 L94,22 L106,26 L120,28" fill="none" stroke="url(#sline)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <div class="ts">UPDATED 14:32</div>
+              </div>
+
+            </div>
+
+            <div class="footer-note">SOURCE: METALS-API · REFRESHES EVERY 60s</div>
+          </div>
+        </div>
+      </div>
+      <div class="caption">Screen 01 &nbsp;·&nbsp; Landing</div>
+    </div>
+
+    <!-- DETAIL -->
+    <div>
+      <div class="phone">
+        <div class="screen">
+          <div class="notch"></div>
+          <div class="content">
+
+            <div class="nav glass">
+              <div class="iconbtn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+              </div>
+              <div class="nav-title">Gold · XAU</div>
+              <div class="iconbtn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>
+              </div>
+            </div>
+
+            <div class="hero glass-strong">
+              <div class="hero-head">
+                <span class="swatch gold"></span>
+                <span class="name">Gold</span>
+                <span class="chip">XAU · 22K</span>
+              </div>
+              <div class="hero-price">₹ 7,284.50</div>
+              <div class="range-delta">
+                <div class="d">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="7 14 12 9 17 14"/></svg>
+                  1W · ₹188.20 &nbsp;+2.64%
+                </div>
+                <div class="purity-pill">
+                  <button>24K</button>
+                  <button class="active">22K</button>
+                  <button>18K</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="chart-card glass">
+              <svg class="chart" viewBox="0 0 360 200" preserveAspectRatio="none">
+                <defs>
+                  <linearGradient id="cline" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0" stop-color="#FBBF24"/>
+                    <stop offset="1" stop-color="#F59E0B"/>
+                  </linearGradient>
+                  <radialGradient id="cfill" cx="50%" cy="100%" r="80%">
+                    <stop offset="0" stop-color="#F59E0B" stop-opacity="0.35"/>
+                    <stop offset="1" stop-color="#F59E0B" stop-opacity="0"/>
+                  </radialGradient>
+                </defs>
+                <g stroke="rgba(255,255,255,0.06)" stroke-dasharray="3 4">
+                  <line x1="0" x2="360" y1="30" y2="30"/>
+                  <line x1="0" x2="360" y1="80" y2="80"/>
+                  <line x1="0" x2="360" y1="130" y2="130"/>
+                  <line x1="0" x2="360" y1="180" y2="180"/>
+                </g>
+                <path d="M0,150 C30,140 50,148 80,128 C120,100 150,118 180,90 C210,64 240,78 270,52 C300,36 330,44 360,30 L360,200 L0,200 Z" fill="url(#cfill)"/>
+                <path d="M0,150 C30,140 50,148 80,128 C120,100 150,118 180,90 C210,64 240,78 270,52 C300,36 330,44 360,30" fill="none" stroke="url(#cline)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <line x1="235" x2="235" y1="20" y2="180" stroke="rgba(255,255,255,0.35)" stroke-dasharray="2 3" stroke-width="1"/>
+                <circle cx="235" cy="66" r="4" fill="#FBBF24" stroke="#0B1020" stroke-width="2"/>
+              </svg>
+              <div class="tip">
+                <div>₹ 7,246.10</div>
+                <div class="tip-ts">THU · 14:00</div>
+              </div>
+              <div class="chart-axis">
+                <span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span>
+              </div>
+            </div>
+
+            <div class="range-chips">
+              <button class="chipbtn">1D</button>
+              <button class="chipbtn active">1W</button>
+              <button class="chipbtn">1M</button>
+              <button class="chipbtn">1Y</button>
+            </div>
+
+            <div class="stats glass">
+              <div class="stat">
+                <div class="k">Open</div>
+                <div class="v">7,096.30</div>
+              </div>
+              <div class="stat">
+                <div class="k">High</div>
+                <div class="v">7,312.00</div>
+              </div>
+              <div class="stat">
+                <div class="k">Low</div>
+                <div class="v">7,084.80</div>
+              </div>
+            </div>
+
+            <div class="footer-note" style="margin-top:auto">UPDATED 14:32 · METALS-API</div>
+          </div>
+        </div>
+      </div>
+      <div class="caption">Screen 02 &nbsp;·&nbsp; Detail / Graph</div>
+    </div>
+
+  </div>
+</body>
+</html>
